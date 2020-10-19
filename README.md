@@ -70,13 +70,13 @@ agttctcttcggacttcgcgAGGTTACAGCGGGAGTCTCT	1_3R	Eco837.22.Z:21913-21894<br/>
 Each test X in the testing folder can be run as follows: $ perl bin/bigdna.pl testing/X/config
 
 To reproduce all data generated for our publication,
-from the bigdna directory:
-$ perl bin/indel.pl  # Populates 'runs' directory with insertion/deletion config files
-$ perl bin/jobmaker.pl jobs/runs.settings  # Populates 'runs' directory with main job set, jobs/tails files
-[EDIT jobs/batch: BATCH=runs, set --jobs to number of cpu available]
-$ bash jobs/batch   # Runs 191082 jobs
-$ perl bin/jobmaker.pl jobs/eighths.settings  # Populates 'runs' directory with 8 eighth-Mycoplasma jobs
-[EDIT jobs/batch to BATCH=eighths, to --jobs 8]
-$ bash jobs/batch  # Runs 8 eighths jobs
+from the bigdna directory:<br/>
+$ perl bin/indel.pl  # Populates 'runs' directory with insertion/deletion config files<br/>
+$ perl bin/jobmaker.pl jobs/runs.settings  # Populates 'runs' directory with main job set, jobs/tails files<br/>
+[EDIT jobs/batch: BATCH=runs, set --jobs to number of cpu available]<br/>
+$ bash jobs/batch   # Runs 191082 jobs<br/>
+$ perl bin/jobmaker.pl jobs/eighths.settings  # Populates 'runs' directory with 8 eighth-Mycoplasma jobs<br/>
+[EDIT jobs/batch to BATCH=eighths, to --jobs 8]<br/>
+$ bash jobs/batch  # Runs 8 eighths jobs<br/>
 The jobs/batch script requires installation of GNU parallel (https://www.gnu.org/software/parallel/)
 If you don't plan to repeat this validation, you can save space by deleting the 'sequences/genomes' directory
