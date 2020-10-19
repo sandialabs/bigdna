@@ -1,0 +1,6 @@
+3082.gff: islands from 6415 of TIGER paper that were between 20-100 kpb and had no blocks of 2 or more ambiguous nucleotides
+200.gff: subset of 3082.gff with 85 3-fragment, 65 4-fragment and 50 5-fragment rebuilds, all known to complete even with tntBlast
+mockX.gff: for each island of 3082.gff, a different region was taken of the same length from the same accession, not allowed to overlap known islands, rRNA genes or other mocks
+eighths.gff: the 8 "eighths" of the synthetic M. genitalium genome were taken, adding 100-bp tolerance windows, since perfect ends failed
+ecoli.fa, ecoli.gff, mgenit.fa: data for simple test system
+genomes directory: 1211 subdirectories, each containing a genome.fa and isleannots.gff file for a genome containing a study island

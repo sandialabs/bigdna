@@ -1,0 +1,7 @@
+BATCH="runs4.1"
+#BATCH="test"
+#BATCH="eighths"
+#srun perl bin/jobmaker.pl $BATCH.settings
+srun parallel --jobs 134 < jobs/$BATCH.jobs
+srun parallel --jobs 134 < jobs/$BATCH.tails
+srun perl bin/supersum.pl jobs/$BATCH.settings > finalReports/$BATCH

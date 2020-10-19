@@ -1,0 +1,12 @@
+TYPE=SETTING
+DELTA_INT=1
+=
+TYPE=SEGMENT
+NAME=Eco837.22.Z
+FASTA=../../sequences/ecoli.fa
+ANNOT=../../sequences/ecoli.gff
+ENTRY=NC_000913.2
+L=2753966
+R=2775998
+ORIENT=+
+=

@@ -1,0 +1,8 @@
+CP000925.1	pub	eighth	582831	73574	.	+	.	ID=A;cassettes=1-12;org=Synthetic Mycoplasma genitalium JCVI-1.0;fasta=../../../sequences/mgenit.fa;
+CP000925.1	pub	eighth	73295	143511	.	+	.	ID=B;cassettes=13-24;org=Synthetic Mycoplasma genitalium JCVI-1.0;fasta=../../../sequences/mgenit.fa;
+CP000925.1	pub	eighth	143232	214833	.	+	.	ID=C;cassettes=25-36;org=Synthetic Mycoplasma genitalium JCVI-1.0;fasta=../../../sequences/mgenit.fa;
+CP000925.1	pub	eighth	214554	279052	.	+	.	ID=D;cassettes=37-49;org=Synthetic Mycoplasma genitalium JCVI-1.0;fasta=../../../sequences/mgenit.fa;
+CP000925.1	pub	eighth	278589	352341	.	+	.	ID=E;cassettes=50-61;org=Synthetic Mycoplasma genitalium JCVI-1.0;fasta=../../../sequences/mgenit.fa;
+CP000925.1	pub	eighth	352062	444945	.	+	.	ID=F;cassettes=62-77;org=Synthetic Mycoplasma genitalium JCVI-1.0;fasta=../../../sequences/mgenit.fa;
+CP000925.1	pub	eighth	444581	518024	.	+	.	ID=G;cassettes=78-89;org=Synthetic Mycoplasma genitalium JCVI-1.0;fasta=../../../sequences/mgenit.fa;
+CP000925.1	pub	eighth	517745	140	.	+	.	ID=H;cassettes=90-101;org=Synthetic Mycoplasma genitalium JCVI-1.0;fasta=../../../sequences/mgenit.fa;
