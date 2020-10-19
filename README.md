@@ -47,7 +47,7 @@ Additional assembly option keys for SEGMENT records (omitting both types means t
 Sample Configuration file content
 TYPE=SETTING
 PRIMER_MAX_SIZE=33
-=
+\=
 TYPE=SEGMENT
 NAME=Eco837.22.Z
 FASTA=../../sequences/ecoli.fa
@@ -57,7 +57,7 @@ R=2775998
 ORIENT=+
 L_TOLERANCE=200
 R_TOLERANCE=200
-=
+\=
 
 Output (primers.txt) from above
 agagactcccgctgtaacctCGCGAAGTCCGAAGAGAACT	1_1F	Eco837.22.Z:109-128
