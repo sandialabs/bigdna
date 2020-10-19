@@ -44,28 +44,28 @@ Additional assembly option keys for SEGMENT records (omitting both types means t
  L_GENE, R_GENE:           the terminus of the PCR product is allowed within a window, whose size is determined by the distal-most gene end; requires access to a ANNOT file.
  DELTA_INT: deletes the closest integrase gene to an end of the SEGMENT and 100 bp at the other end (dedicated to a particular phage engineering problem)
 
-Sample Configuration file content<br\>
-TYPE=SETTING<br\>
-PRIMER_MAX_SIZE=33<br\>
-=<br\>
-TYPE=SEGMENT<br\>
-NAME=Eco837.22.Z<br\>
-FASTA=../../sequences/ecoli.fa<br\>
-ENTRY=NC_000913.2<br\>
-L=2753966<br\>
-R=2775998<br\>
-ORIENT=+<br\>
-L_TOLERANCE=200<br\>
-R_TOLERANCE=200<br\>
-=<br\>
+Sample Configuration file content<br/>
+TYPE=SETTING<br/>
+PRIMER_MAX_SIZE=33<br/>
+=<br/>
+TYPE=SEGMENT<br/>
+NAME=Eco837.22.Z<br/>
+FASTA=../../sequences/ecoli.fa<br/>
+ENTRY=NC_000913.2<br/>
+L=2753966<br/>
+R=2775998<br/>
+ORIENT=+<br/>
+L_TOLERANCE=200<br/>
+R_TOLERANCE=200<br/>
+=<br/>
 
-Output (primers.txt) from above<br\>
-agagactcccgctgtaacctCGCGAAGTCCGAAGAGAACT	1_1F	Eco837.22.Z:109-128<br\>
-CATGTGTCGACGCAACGATC	1_1R	Eco837.22.Z:6687-6668<br\>
-CCGCAACAGTTGGTGACTTG	1_2F	Eco837.22.Z:6640-6659<br\>
-CTGCGCTCATCGTTCGAAAG	1_2R	Eco837.22.Z:15783-15764<br\>
-CTCCAGAGGTAGGCCACGTA	1_3F	Eco837.22.Z:15744-15763<br\>
-agttctcttcggacttcgcgAGGTTACAGCGGGAGTCTCT	1_3R	Eco837.22.Z:21913-21894<br\>
+Output (primers.txt) from above<br/>
+agagactcccgctgtaacctCGCGAAGTCCGAAGAGAACT	1_1F	Eco837.22.Z:109-128<br/>
+CATGTGTCGACGCAACGATC	1_1R	Eco837.22.Z:6687-6668<br/>
+CCGCAACAGTTGGTGACTTG	1_2F	Eco837.22.Z:6640-6659<br/>
+CTGCGCTCATCGTTCGAAAG	1_2R	Eco837.22.Z:15783-15764<br/>
+CTCCAGAGGTAGGCCACGTA	1_3F	Eco837.22.Z:15744-15763<br/>
+agttctcttcggacttcgcgAGGTTACAGCGGGAGTCTCT	1_3R	Eco837.22.Z:21913-21894<br/>
 
 Each test X in the testing folder can be run as follows: $ perl bin/bigdna.pl testing/X/config
 
