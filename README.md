@@ -1,29 +1,29 @@
 # bigdna
-BigDNA suggests primers for the long PCRs (SEGMENTs) needed for a big DNA assembly
+BigDNA suggests primers for the long PCRs (SEGMENTs) needed for a big DNA overlap assembly.
 It takes a configuration file as input and outputs the files primers.txt (listing suggested oligos for assembly) and bigdna.log.
 bigDNA relies heavily on Primer3 (https://primer3.org), which must be installed properly and in your PATH; likewise for tntBlast (https://public.lanl.gov/jgans/tntblast/tntblast_doc.html) unless you turn its use off with the TNT_OFF configuration tag.
 Run "perl [path/]bigdna.pl -h" for additional options.
-Sample call: $ perl bigdna.pl configfile
+Sample call: $ perl bigdna.pl configfile<br\>
 
 Configuration file specifications:
-The config file is based on the simple Boulder-IO multi-record format (one key=value pair tag per line, except for lone-equals-sign lines that separate records) with further modifications:
+The config file is based on the simple Boulder-IO multi-record format (one key=value pair tag per line, except for lone-equals-sign lines that separate records) with further modifications:<br\>
 You'll find valid examples of config files in the "testing" directory of this package.
 Each record requires a TYPE=value first line, where allowed values are SETTING, SEGMENT and REGION. At least one SEGMENT record is required that points to a FASTA file (see "REGION records" below). The FASTA value must be an **absolute** path/file to a fastA file.
 We recommend that each FASTA file reflect the entire sequence of the DNA prep template for PCR of SEGMENT, e.g., a whole bacterial genome.
 
-Tags allowed for the TYPE=SETTING record are:
- PCR_MAX_SIZE=<integer>,
- FRAGMENT_MAX_NUM=<integer>,
- OVERLAP_MAX_SIZE=<integer>,
- OVERLAP_MIN_SIZE=<integer>,
- OPTIMIZE=<'penalty' or 'uniform'> (optimization metric, default = penalty),
- RETEST=1 (turns off the block to previously seen 5' ends during rebuilding),
- LINEAR=1 (default is to circularize the final product),
- FIND_ALL=1 (exhaustive search mode),
+Tags allowed for the TYPE=SETTING record are:<br\>
+ PCR_MAX_SIZE=<integer>,<br\>
+ FRAGMENT_MAX_NUM=<integer>,<br\>
+ OVERLAP_MAX_SIZE=<integer>,<br\>
+ OVERLAP_MIN_SIZE=<integer>,<br\>
+ OPTIMIZE=<'penalty' or 'uniform'> (optimization metric, default = penalty),<br\>
+ RETEST=1 (turns off the block to previously seen 5' ends during rebuilding),<br\>
+ LINEAR=1 (default is to circularize the final product),<br\>
+ FIND_ALL=1 (exhaustive search mode),<br\>
  THERMODYNAMICS=<comma-separated list from hiLx,loTx,hiHx,hiMx,hiTx,loGx>
    where x is value for PRIMER_ tags (respectively) MAX_SIZE, MIN_TM, MAX_HAIRPIN_TH, MAX_POLY_X, MAX_TM or MIN_GC
  or they start with 'PRIMER_' (valid Primer3 tags) 
- or 'TNT_' (to configure tntBlast; TNT_OFF turns off tntBlast use).
+ or 'TNT_' (to configure tntBlast; TNT_OFF turns off tntBlast use).<br\>
 These tags override any same-key tags of the global lib/defaults.txt file.
 
 For multi-SEGMENT assembly, each SEGMENT record must appear in the order (and orientation) for the desired assembly.
