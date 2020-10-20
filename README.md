@@ -12,15 +12,15 @@ Each record requires a TYPE=value first line, where allowed values are SETTING, 
 We recommend that each FASTA file reflect the entire sequence of the DNA prep template for PCR of SEGMENT, e.g., a whole bacterial genome.
 
 Tags allowed for the TYPE=SETTING record are:<br/>
- PCR_MAX_SIZE=<integer>,<br/>
- FRAGMENT_MAX_NUM=<integer>,<br/>
- OVERLAP_MAX_SIZE=<integer>,<br/>
- OVERLAP_MIN_SIZE=<integer>,<br/>
- OPTIMIZE=<'penalty' or 'uniform'> (optimization metric, default = penalty),<br/>
+ PCR_MAX_SIZE=[integer],<br/>
+ FRAGMENT_MAX_NUM=[integer],<br/>
+ OVERLAP_MAX_SIZE=[integer],<br/>
+ OVERLAP_MIN_SIZE=[integer],<br/>
+ OPTIMIZE=['penalty' or 'uniform'] (optimization metric, default = penalty),<br/>
  RETEST=1 (turns off the block to previously seen 5' ends during rebuilding),<br/>
  LINEAR=1 (default is to circularize the final product),<br/>
  FIND_ALL=1 (exhaustive search mode),<br/>
- THERMODYNAMICS=<comma-separated list from hiLx,loTx,hiHx,hiMx,hiTx,loGx>
+ THERMODYNAMICS=[comma-separated list from hiLx,loTx,hiHx,hiMx,hiTx,loGx]
    where x is value for PRIMER_ tags (respectively) MAX_SIZE, MIN_TM, MAX_HAIRPIN_TH, MAX_POLY_X, MAX_TM or MIN_GC
  or they start with 'PRIMER_' (valid Primer3 tags) 
  or 'TNT_' (to configure tntBlast; TNT_OFF turns off tntBlast use).<br/>
@@ -32,17 +32,17 @@ REGION and SEGMENT records  must have a second line, NAME=value, where the value
 For REGION records, a FASTA tag is required (value is a path/file to a fastA file, either absolute or relative to the directory of the config file).
 Each SEGMENT record must have either a FASTA tag or a single REFERENCE=region-name that leads to a FASTA.
 
-Other optional keys in REGION and SEGMENT records are:
- ENTRY: strongly suggested for pointing to a particular entry in the FASTA, otherwise the first FASTA entry will be used.
- ANNOT: path/file to a gff3 formatted file (either absolute or relative to the directory of the config file); should only accompany a matching FASTA.
- L: 1-based  left endpoint of the SEGMENT or REGION; L=0 or omitted L=value is converted to L=1.
- R: 1-based right endpoint of the SEGMENT or REGION; R=0 or omitted R=value is converted to the rightmost postion of the FASTA(ENTRY) or REFERENCE.
- ORIENT: orientation relative to the FASTA or reference REGION; only + or - values allowed; taken as + if omitted.
+Other optional keys in REGION and SEGMENT records are:<br/>
+ ENTRY: strongly suggested for pointing to a particular entry in the FASTA, otherwise the first FASTA entry will be used.<br/>
+ ANNOT: path/file to a gff3 formatted file (either absolute or relative to the directory of the config file); should only accompany a matching FASTA.<br/>
+ L: 1-based  left endpoint of the SEGMENT or REGION; L=0 or omitted L=value is converted to L=1.<br/>
+ R: 1-based right endpoint of the SEGMENT or REGION; R=0 or omitted R=value is converted to the rightmost postion of the FASTA(ENTRY) or REFERENCE.<br/>
+ ORIENT: orientation relative to the FASTA or reference REGION; only + or - values allowed; taken as + if omitted.<br/>
 
-Additional assembly option keys for SEGMENT records (omitting both types means the terminus of the PCR product will be forced to the extreme L or R end):
- L_TOLERANCE, R_TOLERANCE: the terminus of the PCR product is allowed within a window, whose size is fixed by the given value.
- L_GENE, R_GENE:           the terminus of the PCR product is allowed within a window, whose size is determined by the distal-most gene end; requires access to a ANNOT file.
- DELTA_INT: deletes the closest integrase gene to an end of the SEGMENT and 100 bp at the other end (dedicated to a particular phage engineering problem)
+Additional assembly option keys for SEGMENT records (omitting both types means the terminus of the PCR product will be forced to the extreme L or R end):<br/>
+ L_TOLERANCE, R_TOLERANCE: the terminus of the PCR product is allowed within a window, whose size is fixed by the given value.<br/>
+ L_GENE, R_GENE:           the terminus of the PCR product is allowed within a window, whose size is determined by the distal-most gene end; requires access to a ANNOT file.<br/>
+ DELTA_INT: deletes the closest integrase gene to an end of the SEGMENT and 100 bp at the other end (dedicated to a particular phage engineering problem)<br/>
 
 Sample Configuration file content<br/>
 TYPE=SETTING<br/>
