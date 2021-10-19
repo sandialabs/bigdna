@@ -1,12 +1,14 @@
 #! usr/bin/perl
 use strict; use warnings; use File::Spec; use Time::HiRes qw(time); use POSIX qw(strftime);
 
-my ($verbose, $noprimers, $map, $configfile, %config, %segs, %coord, $setting, $recur, $p3begin, $ret, $optP);
+my ($verbose, $configfile, %config, %segs, %coord, $setting, $recur, $p3begin, $ret, $optP, %optima);
 my (@solved, @frags, $fCt, $fLen, $seg, %seen, %ass, %p3s, $tntcall, %tnts, %tntbads, %stats, %windows);
+my %subopt = qw/pen maxpen maxpen pen uni maxuni maxuni uni/;
 my $t0 = time;
 my $invoke = "Called \"$0 @ARGV\" on " . localtime;
-my %paths = (bin => File::Spec->rel2abs($0)); $paths{bin} =~ s/\/([^\/]+)$//; my $scriptname = $1;
-Options(); # see bottom of script; help and other messages, Getopt
+#my %paths = (bin => File::Spec->rel2abs($0)); $paths{bin} =~ s/\/([^\/]+)$//; my $scriptname = $1;
+my %paths = (install => File::Spec->rel2abs($0)); $paths{install} =~ s/\/[^\/]+\/([^\/]+)$//; my $scriptname = $1;
+Options();  # See bottom of script; help and other messages, Getopt
 chdir $paths{out};
 open LOG, ">bigdna.log";
 Log("$invoke\nConfig file: $paths{in}/$configfile\n") if $verbose;
@@ -56,7 +58,7 @@ sub Recurse {  # Full backdown for 1st-solution triggered by return value 1 at S
 }
 
 sub Stats {
- my @cats = qw/flen frag rend done back tryfrst frst trylast last tryint int pen uni tnt_test tnt_fail tnt_nohit tnt_multi time solved reject/;
+ my @cats = qw/flen frag rend done back tryfrst frst trylast last tryint int pen maxpen uni maxuni tnt_test tnt_fail tnt_nohit tnt_multi time solved reject/;
  @stats{qw/tnt_test tnt_fail/} = (scalar(keys %tnts), scalar(keys %tntbads));
  for (@cats) {$stats{$_} = 0 unless $stats{$_}}
  $stats{back} = 1 if $stats{done} and $stats{tryint} + $stats{trylast} > $stats{int} + $stats{last};
@@ -101,12 +103,11 @@ sub Rebuilds {  # Rebuild each segment of assembly (including single-PCR segment
    @R = sort {$b <=> $a} @R;
    $windows{Rin} = $R[0];
   } elsif ($$s{R_TOLERANCE}) {$windows{Rin} = $$s{len}-$$s{R_TOLERANCE}+1}
-  #for (sort keys %windows) {print "$_ $windows{$_}\n"}
   $fCt = ($windows{Rout}-$windows{Lout}+1)/$$set{PCR_MAX_SIZE}; $fCt ++ unless $fCt == int $fCt; $fCt = int $fCt;
   $fLen = int(($windows{Rout}-$windows{Lout}+1)/$fCt);
   %stats = (len => $$s{len}, frag => $fCt, flen => $fLen);
   my $max = $fLen + 2* $$set{REBUILD_WINDOW};
-  my $opt = $$set{opt};
+  my $opt = $$set{optmax}.$$set{opt};
   $p3begin =~ s/(PRIMER_PRODUCT_SIZE_RANGE=\d+-)\S*/$1$max/;
   $$set{PRIMER_PRODUCT_SIZE_RANGE} = '200-' . ($fLen + 2* $$set{REBUILD_WINDOW}); 
   Log("$segs{$seg}{len}-bp Segment $seg rebuilding with $fCt PCRs of ~$fLen: end windows L:$windows{Lout}-$windows{Lin}, R:$windows{Rin}-$windows{Rout}\n");
@@ -115,13 +116,13 @@ sub Rebuilds {  # Rebuild each segment of assembly (including single-PCR segment
   Recurse();  # Start recursion
   unless (@solved) {Log(Timer() . "FATAL: $segs{$seg}{len}-bp Segment $seg $fCt-PCR rebuilding failed\n"); Stats(); exit}
   if ($$set{SOLUTION} eq 'exhaustive') {
-   if ($opt eq 'pen') {$opt = 'uni'} else {$opt = 'pen'}  # Find and report optimal by undesired criterion first
-   @solved = sort {$$a{$opt} <=> $$b{$opt}} @solved;  # Post-exhaustive non-opt not tnt-checked!
-   my %sco; @sco{qw/pen uni/} = ($solved[0]{pen}/$fCt, $solved[0]{uni}/$fCt);
-   $stats{$opt} = $sco{$opt};
-   Log("$opt-optimizing: penalty=$sco{pen}, nonuniformity=$sco{uni}:$solved[0]{sum}\n");
-   $opt = $$set{opt};
-   @solved = sort {$$a{$opt} <=> $$b{$opt}} @solved;  # Leave solved[0] as the best by OPTIMIZE
+   for my $opt (qw/pen uni maxpen maxuni/) {
+    my %sco;
+    for my $stat (qw/pen uni maxpen maxuni/) {$sco{$stat} = $optima{$opt}{$stat}}
+    $stats{$opt} = $sco{$opt};
+    Log("$opt-optimizing: penalty=$sco{pen}, nonuniformity=$sco{uni}, maxpenalty=$sco{maxpen}, maxnonuni=$sco{maxuni}:$optima{$opt}{sum}\n");
+   }
+   @solved = sort {$$a{$opt} <=> $$b{$opt} || $$a{$subopt{$opt}} <=> $$b{$subopt{$opt}}} @solved;  # solved[0] best by OPTIMIZE
    if ($$set{TNT_USE} eq 'post-exhaustive') {
     Log("Tnt launched, post-exhaustive\n") if $verbose; 
     while (@solved) {
@@ -133,14 +134,14 @@ sub Rebuilds {  # Rebuild each segment of assembly (including single-PCR segment
       shift @solved;
       next;
      }
-     last;
+     last;  # Stop at first tnt-acceptable of ranked solutions
     }
    }
   }
   unless (@solved) {Log(Timer() . "FATAL: $segs{$seg}{len}-bp Segment $seg $fCt-PCR rebuilding failed after post-exhaustive tntBlast\n"); Stats(); exit}
-  my %sco; @sco{qw/pen uni/} = ($solved[0]{pen}/$fCt, $solved[0]{uni}/$fCt);
-  for (qw/pen uni/) {$stats{$_} = $sco{$_} unless $stats{$_}}
-  Log("Final $opt-optimizing: penalty=$sco{pen}, nonuniformity=$sco{uni}:$solved[0]{sum}\n");
+  my %sco;
+  for my $stat (qw/pen uni maxpen maxuni/) {$sco{$stat} = $solved[0]{$stat}; $stats{$stat} = $sco{$stat} unless $stats{$stat}}
+  Log("Final $opt-optimizing: penalty=$sco{pen}, nonuniformity=$sco{uni}, maxpenalty=$sco{maxpen}, maxnonuni=$sco{uni}:$solved[0]{sum}\n");
   Log("$stats{reject} rejects of $stats{solved} solutions\n") if $verbose and $stats{reject};
   @stats{qw/time done/} = (sprintf("%.6f", time-$t0), 1);
   Stats();
@@ -154,9 +155,13 @@ sub Solution {  # Return value is number of backtracks to perform immediately
  for my $i (1..$#frags) {
   $t{pen} += $frags[$i]{pen};
   $t{uni} += $frags[$i]{uni};
+  $t{maxpen} = $frags[$i]{pen} unless $t{maxpen} and $t{maxpen} >= $frags[$i]{pen};
+  $t{maxuni} = $frags[$i]{uni} unless $t{maxuni} and $t{maxuni} >= $frags[$i]{uni};
   push @{$t{sol}}, [@{$frags[$i]{L}}[0,1,2], @{$frags[$i]{R}}[0,1,2]];
   $sum .= " F$i:$frags[$i]{L}[0]-$frags[$i]{R}[0] $frags[$i]{L}[1],$frags[$i]{R}[1];";
  }
+ for (qw/pen uni/) {$t{$_} = sprintf "%.3f", $t{$_}/$fCt}
+ $t{maxpen} = sprintf "%.3f", $t{maxpen};
  if ($$set{TNT_USE} eq 'per-solution') {
   Log("Tnt per-solution launched for " . scalar(@frags) . " fragments, per-solution\n") if $verbose;
   for my $i (1..$#frags) {push @{$t{tnt}}, [@{$frags[$i]{L}}[0,2], @{$frags[$i]{R}}[0,2], $frags[$i]{sum}]}  # [0] Lcoord [1] Lseq [2] Rcoord [3] Rseq [4] pcrSummary
@@ -167,8 +172,13 @@ sub Solution {  # Return value is number of backtracks to perform immediately
    return $ret;
   }
  }
- Log("$seg SOLVED: Penalty=$t{pen}; Nonuni=$t{uni};$sum\n") if $verbose;
- push @solved, {pen => $t{pen}, uni => $t{uni}, sol => $t{sol}, sum => $sum};
+ Log("$seg SOLVED: Penalty=$t{pen}; Nonuni=$t{uni}; MaxPenalty=$t{maxpen}; MaxNonuni=$t{maxuni};$sum\n") if $verbose;
+ for my $opt (qw/pen uni maxpen maxuni/) {
+  next if $optima{$opt} and ($optima{$opt}{$opt} < $t{$opt} or 
+   ($optima{$opt}{$opt} == $t{$opt} and $optima{$opt}{$subopt{$opt}} <= $t{$subopt{$opt}}));  # Avg and Max optimize each other?
+  %{$optima{$opt}} = (pen => $t{pen}, uni => $t{uni}, maxpen => $t{maxpen}, maxuni => $t{maxuni}, sol => $t{sol}, sum => $sum);
+ }
+ push @solved, {pen => $t{pen}, uni => $t{uni}, maxpen => $t{maxpen}, maxuni => $t{maxuni}, sol => $t{sol}, sum => $sum};
  if ($$set{SOLUTION} eq 'exhaustive') {return 0} else {return $#frags}  # Full backdown for 1st
 }
 
@@ -179,7 +189,7 @@ sub Tnt {  # Tests all PCRs of a rebuild solution OR (per-recursion) all PCRs fr
  for (my $i=$#{$pcrs}; $i >= 0; $i--) { #  Contents of each PCR are: [0] Lend, [1] Lseq, [2] Rend, [3] Rseq, [4] ExpectLabel
   $expect = ${$pcrs}[$i][4];  # Each $expect should be a label like this: 'Lend-Rend,lenL,lenR'
   $backtracks = $#{$pcrs} -$i if $tntbads{$expect};  # Backtracks to fix leftmost bad PCR
-  next if $tnts{$expect};
+  next if $tnts{$expect};  # Previously found to fail
   $expect =~ /(,.*)/; 
   %{$expected{$expect}} = (ct => 0, lens => $1);
   push @in, join(' ', $expect, @{$$pcrs[$i]}[1,3]) . "\n";  # @in are tnt inputs; empty if all previously tested
@@ -348,7 +358,7 @@ sub P3stats {
 
 sub ReadConfig {  # L=0 > 1; R=0 > full-length
  my ($order, $type, $name) = (1);
- for (`cat $configfile`) {
+ for (`cat $paths{in}/$configfile`) {
   next if /^#/;
   my ($key, $value) = ('', '');
   chomp;
@@ -370,12 +380,13 @@ sub ReadConfig {  # L=0 > 1; R=0 > full-length
    Log("No type specified in configfile $configfile line $_\n"), exit unless $type;
    if ($type eq 'SETTING') {$config{$type}{$key} = $value; next}
    Log("No name specified in configfile $configfile line $_\n"), exit unless $name;
-   $config{$type}{$name}{$key} = $value;
    for (qw/FASTA ANNOT/) {  # Convert relative path (from config file dir) into absolute path; check file existence
     next unless $key eq $_;
+    $value =~ s/INSTALL/$paths{install}/;
     $value = File::Spec->rel2abs($value);
     unless (-f $value) {Log("No $_ $value\n"); exit}
    }
+   $config{$type}{$name}{$key} = $value;
    if ($value =~ /[^\d]/ and ($key eq 'L' or $key eq 'R')) {Log("L and R values must be zero or positive integer\n"); exit}
    if ($key eq 'ORIENT' and $value !~ /^[\+\-]$/) {Log("ORIENT must be + or -\n"); exit}
    $config{$type}{$name}{L} = 1 unless $config{$type}{$name}{L};
@@ -384,6 +395,8 @@ sub ReadConfig {  # L=0 > 1; R=0 > full-length
  }
  for (qw/PRIMER_OPT_SIZE PCR_MAX_SIZE REBUILD_WINDOW OVERLAP_MAX_SIZE OVERLAP_MIN_SIZE OPTIMIZE/) 
  {Log("FATAL: $_ not set\n"), exit unless defined $config{SETTING}{$_}}
+ $config{SETTING}{optmax} = '';
+ $config{SETTING}{optmax} = $1 if $config{SETTING}{OPTIMIZE} =~ s/^(max)//;
  $config{SETTING}{opt} = $config{SETTING}{OPTIMIZE}; $config{SETTING}{opt} =~ s/^(...).*/$1/;  # Short form often useful 
  $optP = $$set{PRIMER_OPT_SIZE};
  Log("No TYPE=SEGMENT line(s) in configfile $configfile\n"), exit unless %segs;
@@ -489,7 +502,7 @@ sub GetAnnot {
 
 sub Revcomp {my $seq = $_[0]; $seq =~ tr/ACGT/TGCA/; $seq = reverse $seq; return $seq}
 sub ReadDefault {
- $paths{lib} = $paths{bin}; $paths{lib} =~ s/[^\/]*$/lib/;
+ $paths{lib} = $paths{install}; $paths{lib} .= '/lib'; 
  for (`cat $paths{lib}/default.txt`) {chomp; $config{SETTING}{$1} = $2 if /^([^#]\S*)=(.+)/}
  $config{SETTING}{PRIMER_FIRST_BASE_INDEX} = 1;  # Insist on 1-based indexing
  my $path = `which primer3_core`; chomp $path;
@@ -501,14 +514,12 @@ sub ReadDefault {
 sub Timer{my $t = sprintf("%.6f", time-$t0); return "[t=$t] "}
 
 sub Options {
-my $version = '1.0 (Nov 2020)';
+my $version = '1.1 (Oct 2021)';
 #   '    |    '    |    '    |    '    |    '    |    '    |    '    |    '    |
 my $help = <<END;
 $scriptname version $version
 Usage: perl $scriptname [options] CONFIG_FILE
- -map       Create a map of the fragments named -n.png or, if -n is not given, -fConstruct.png
  -out       <output directory> (default uses same directory as CONFIG_FILE)
- -noprimers Omit output primers.txt file
  -verbose   Print log messages to screen also
   Additional options: -help, -version, -authors, -license
   See README.txt for further details and CONFIG_FILE instructions.
@@ -520,11 +531,9 @@ END
   'help'     => sub {print $help; exit},
   'version'  => sub {print "$scriptname version $version\n"; exit},
   'authors'  => sub {print "AUTHORS: Ivan Vuong, Catherine Mageeney, Kelly Williams (kpwilli\@sandia.gov)\n"; exit},
-  'license'  => sub {print `cat $paths{bin}/../LICENSE`; exit},
+  'license'  => sub {print `cat $paths{install}/LICENSE`; exit},
   'verbose'  => \$verbose,
   'out=s'    => \$paths{out},
-  'noprimers'=> \$noprimers,
-  'map'      => \$map,
  );
  die $help if !$options_okay;
  $configfile = $ARGV[-1];
