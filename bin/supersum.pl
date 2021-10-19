@@ -1,3 +1,4 @@
+#! /usr/bin/perl
 use strict; use warnings;
 die "Usage: perl $0 SETS.settings > SETS.supersum\n" unless $ARGV[0] and -f $ARGV[0];
 my ($setsfile, %ccref, %nocc) = ($ARGV[0]);  # 'cc' means the subset of 200 used for exhaustive and finding cognates among 3082
@@ -11,7 +12,7 @@ my ($i, %settingss, @setorder) = (0);
 #for (split /\t/, $header) {$sets{$_} = $i; push @setsorder, $_; $i ++}
 for (split /\t/, $header) {push @setorder, $_}
 #my @outsetsorder = qw/Run OPTIMIZE OVERLAP_MAX_SIZE OVERLAP_MIN_SIZE PRIMER_NUM_RETURN SOLUTION TNT_USE TREATMENTS Dataset/;
-my @catorder = qw/flen frag rend done back tryfrst frst trylast last tryint int pen uni tnt_test tnt_fail tnt_nohit tnt_multi time solved reject/;
+my @catorder = qw/flen frag rend done back tryfrst frst trylast last tryint int pen maxpen uni maxuni tnt_test tnt_fail tnt_nohit tnt_multi time solved reject/;
 my @anal = qw//;
 print join("\t", @setorder, @catorder, @anal), "\n";  # Output header line
 while (<SETS>) {
@@ -30,7 +31,7 @@ while (<SETS>) {
  my ($run, $gff, $fragsdone, $ccfragsdone, %tots, %cctots, %d) = ($sets{Run}, $sets{Dataset}, 0);
  for (`cat sums/$run`) {
   chomp; my @g = split "\t";
-  warn "$run $g[0]\n" unless scalar(@g) == 21;
+  warn scalar(@g), " $run $g[0]\n" unless scalar(@g) == 23;
   my $isle = shift @g;
   my %cats;
   for (@catorder) {$cats{$_} = shift @g}
@@ -38,14 +39,14 @@ while (<SETS>) {
   if ($cats{done}) {
    $fragsdone += $cats{frag};
    $ccfragsdone += $cats{frag} if $cc and $ccref{$isle};
-   for (qw/pen uni/) {$cats{$_} *= $cats{frag}}
+   for (qw/pen maxpen uni maxuni/) {$cats{$_} *= $cats{frag}}
   }
   for (@catorder) {
      $tots{$_} += $cats{$_};
    $cctots{$_} += $cats{$_} if $cc and $ccref{$isle};
   }    
  }
- for (qw/pen uni/) {
+ for (qw/pen maxpen uni maxuni/) {
     $tots{$_} /= $fragsdone;
   $cctots{$_} /= $ccfragsdone if $cc;
  }
