@@ -61,4 +61,4 @@ for (`cat sequences/3082.gff`) {
  #die "runs/inserts/$id/config\n";
 }
 open TAILS, ">jobs/indels.tails";
-print TAILS "grep -Pv '^(F|S|[0-9])' runs/inserts/*bigdna.log > sums/inserts\ngrep -Pv '^(F|S|[0-9])' runs/deletes/*bigdna.log > sums/deletes\n";
+print TAILS "egrep -v '^(F|S|[0-9])' runs/inserts/*bigdna.log > sums/inserts\negrep -v '^(F|S|[0-9])' runs/deletes/*bigdna.log > sums/deletes\n";
