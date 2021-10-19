@@ -23,19 +23,18 @@ We recommend that each FASTA file reflect the entire sequence of the DNA prep te
 In sample config files FASTA entries use INSTALL to denote the path to the bigdna folder, but any valid file path is OK
 
 Tags allowed for the TYPE=SETTING record are:
- PCR_MAX_SIZE=<integer>,
- FRAGMENT_MAX_NUM=<integer>,
- OVERLAP_MAX_SIZE=<integer>,
- OVERLAP_MIN_SIZE=<integer>,
- SOLUTION=<'first' or 'exhaustive'>,
- OPTIMIZE=<'penalty', 'uniform', 'maxpenalty' or 'maxuniform'> (optimization metric, default = penalty),
- RETEST=1 (turns off the block to previously seen 5' ends during rebuilding),
- LINEAR=1 (default is to circularize the final product),
- TNT_USE=<'off', 'per-recursion', 'per-solution', or (for exhaustive mode) 'post-exhaustive'>,
- THERMODYNAMICS=<comma-separated list from hiLx,loTx,hiHx,hiMx,hiTx,loGx>
-   where x is value for PRIMER_ tags (respectively) MAX_SIZE, MIN_TM, MAX_HAIRPIN_TH, MAX_POLY_X, MAX_TM or MIN_GC
- or they start with 'PRIMER_' (valid Primer3 tags) 
- or 'TNT_' (to configure tntBlast if on).
+	PCR_MAX_SIZE=<integer>,
+	FRAGMENT_MAX_NUM=<integer>,
+	OVERLAP_MAX_SIZE=<integer>,
+	OVERLAP_MIN_SIZE=<integer>,
+	SOLUTION=<'first' or 'exhaustive'>,
+	OPTIMIZE=<'penalty', 'uniform', 'maxpenalty' or 'maxuniform'> (optimization metric, default = penalty),
+	RETEST=1 (turns off the block to previously seen 5' ends during rebuilding),
+	LINEAR=1 (default is to circularize the final product),
+	TNT_USE=<'off', 'per-recursion', 'per-solution', or (for exhaustive mode) 'post-exhaustive'>,
+	THERMODYNAMICS=<comma-separated list from hiLx,loTx,hiHx,hiMx,hiTx,loGx>
+		where x is value for PRIMER_ tags (respectively) MAX_SIZE, MIN_TM, MAX_HAIRPIN_TH, MAX_POLY_X, MAX_TM or MIN_GC
+		or they start with 'PRIMER_' (valid Primer3 tags) or 'TNT_' (to configure tntBlast if on).
 These tags override any same-key tags of the global lib/defaults.txt file.
 
 For multi-SEGMENT assembly, each SEGMENT record must appear in the order (and orientation) for the desired assembly.
