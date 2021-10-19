@@ -1,2 +1,2 @@
 Run	QUICK_P3	OVERLAP_MIN_SIZE	OVERLAP_MAX_SIZE	OPTIMIZE	SOLUTION	TNT_USE	PRIMER_NUM_RETURN	Dataset	End
-Eighths	hiL30	40	80	penalty	exhaustive	post-solution	7	eighths	100
+Eighths	hiL30	40	80	penalty	exhaustive	post-exhaustive	7	eighths	100
